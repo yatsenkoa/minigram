@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  font-family: "Times New Roman", serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@font-face {
+    font-family: "BadMofo";
+    src: local("BadMofo"),
+      url("./fonts/BadMofo.ttf") format("truetype");
+    font-weight: normal;
+  }
+
+#badmofo {
+    font-family: "BadMofo";
+}
