@@ -68,7 +68,6 @@ const ImageFrame = (props) => {
 const ImageList = (props) => {
 
     const isFirstUpdate = useRef(true);
-
     const apicall = async () =>  {
         var data = '';
         var config = {
@@ -214,6 +213,7 @@ const App = () => {
     const [signup_user, setSignupUser] = useState("");
     const [signup_pass, setSignupPass] = useState("");
     const [got_token, setGotToken] = useState(false);
+    const [filename, setFilename] = useState("");
 
     const cookies = new Cookies();
 
@@ -260,7 +260,29 @@ const App = () => {
         await setSignupPass(event.target.value)
     }
 
-    const onUpload = event => {
+    const links_apicall = async () =>  {
+        var data = '';
+        var config = {
+          method: 'get',
+          url: 'http://localhost:3003/photos',
+          headers: { 
+            'token': token
+          },
+          data : data
+        };
+        axios(config)
+        .then((response) => {
+            console.log(response.data)
+            setLinks(response.data)
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+
+
+    const onUpload = async event => {
+
         if(file != null) {
             event.preventDefault()
             const formData = new FormData()
@@ -280,7 +302,13 @@ const App = () => {
                     'token': token
                 },
             }
-            axios.post(api_url + "/photos", formData, config)
+            await axios.post(api_url + "/photos", formData, config)
+
+            setTitle("")
+            setFile(null)
+            setFilename("");
+
+            links_apicall()
         }
         else {
             console.log("file is null!")
@@ -364,14 +392,14 @@ const App = () => {
                     {
                         logged_in ? <Box><HStack pb='8'><Text>Logged In.</Text><Button variant='link' colorScheme='messenger' onClick={onLogout}>Logout</Button></HStack></Box> : <Box><p>Log In</p>
                         <form>
-                            <input type='text' placeholder='username' onChange={onUserChange}/>
-                            <input type='password' placeholder='password' onChange={onPassChange}/>
+                            <input type='text' placeholder='username' value={user} onChange={onUserChange}/>
+                            <input type='password' placeholder='password' value={pass} onChange={onPassChange}/>
                             <Button variant='link' colorScheme='messenger' onClick={onLogin}>Login</Button>
                         </form>
                         <hr /><p href='/signup'>Sign up</p>
                         <form>
-                            <input type='text' placeholder='username' onChange={onSignupUserChange}/>
-                            <input type='password' placeholder='password' onChange={onSignupPassChange}/>
+                            <input type='text' placeholder='username' value={signup_user} onChange={onSignupUserChange}/>
+                            <input type='password' placeholder='password' value={signup_pass} onChange={onSignupPassChange}/>
                             <Button variant='link' colorScheme='messenger' onClick={onSignup}>Signup</Button>
                         </form>
                         </Box>
@@ -386,7 +414,6 @@ const App = () => {
                         <Box>
                             <ImageList token={token} links={links} setLinks={setLinks} />
                         </Box>
-
                             <Text>
                                 Choose an image
                             </Text>
@@ -398,7 +425,7 @@ const App = () => {
                             Choose the title
                         </p>
                         <Center>
-                            <Input onChange={onTextChange} name="text" type="text:" />
+                            <Input onChange={onTextChange} value={title} name="text" type="text:" />
                         </Center>
                         <Center pb='8'>
                             <Input onClick={onUpload} type="submit" />
