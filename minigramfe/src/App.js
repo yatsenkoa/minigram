@@ -9,12 +9,86 @@ import { Box, Center, Image, Flex, Badge, Text, GridItem, Grid,
     ModalContent,
     Button,
     useDisclosure,
+    Spacer,
+    InputGroup,
+    InputLeftElement,
+    InputRightElement,
+    
   } from "@chakra-ui/react";
+import {
+    Search2Icon
+}from "@chakra-ui/icons"
+
 import Cookies from 'universal-cookie'
 
 import { Routes, Route, useParams, BrowserRouter } from "react-router-dom";
 
 const api_url = "http://localhost:3003";
+
+const SearchBar = () => {
+    return (
+        <Stack spacing={4} pr='28'>
+    <InputGroup>
+    <InputLeftElement
+      children={<Search2Icon color='gray.300' />}
+    />
+    <Input type='tel' placeholder='Search by @' />
+    </InputGroup>
+    </Stack>    
+    )
+
+}
+
+const TopWidget = (props) => {
+    return (
+      <VStack
+        align="space-between"
+        pr='4'
+        pl='4'
+        borderBottom='1px solid gray'
+      >
+      <HStack justify='space-between'>
+          <Text fontSize='5xl' id='badmofo'>minigram</Text>
+          <SearchBar />
+        <HStack>
+            <Text>Login</Text>
+        </HStack>
+      </HStack>
+      </VStack>
+    )
+}
+
+const AddPhotoWidget = () => {
+    return;
+}
+
+const BottomWidget = () => {
+    return;
+}
+
+const UserWidget = (props) => {
+    return(
+    <Center p='8'>
+    <HStack>
+        <VStack>
+            <Image src='/square-128.jpg' borderRadius='full' border='1px solid' />
+        </VStack>
+        <VStack>
+            <HStack>
+                <HStack pb='8'><Text fontSize='2xl' pl='4'>yatsenko</Text><Spacer pr='16'/><Button variant='link' colorScheme='messenger' onClick={props.onLogout}>Logout</Button></HStack>
+            </HStack>
+            <HStack>
+            <p><b>3</b> posts</p>
+            <p><b>27</b> followers</p>
+            <p><b>93</b> following</p>
+            </HStack>
+        </VStack>
+    </HStack>
+
+    </Center>
+    
+    );
+}
 
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
@@ -23,15 +97,43 @@ const sleep = (milliseconds) => {
 const ImageFrame = (props) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    const deletePost = () => {
-        console.log(props)
+    const handleDelete = (_id) => {
+        onClose();
+        props.deletePost(_id);
+    }
+
+    return <>
+    <Box onClick={onOpen}>
+        <Image src={props.src} width='256px' height='256px' border='1px solid'/>
+        <p>{props.title}</p>
+    </Box>
+        <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalContent alignContent={'center'}>
+            <span>
+            <Box>
+                <Image src={props.src} border='1px solid'/>
+            </Box>
+            <HStack pr='2' pl='2' justifyContent='space-between'>
+            <Text fontSize='3xl'>{props.title}</Text>
+            <Button variant='link' colorScheme='messenger' onClick={(() => handleDelete(props._id))}>Delete</Button>
+            </HStack>
+            </span>
+            </ModalContent>
+        </Modal>
+    </>
+}
+
+const ImageList = (props) => {
+
+    const deletePost = (_id) => {
+        props.setLinks(props.links.filter(data => data._id != _id))
         var data = '';
         var config = {
           method: 'delete',
           url: 'http://localhost:3003/photos',
           headers: { 
             'token': props.token,
-            '_id': props._id
+            '_id': _id
           },
           data : data
         };
@@ -43,29 +145,6 @@ const ImageFrame = (props) => {
           console.log(error);
         });
     }
-
-    return <>
-    <Box onClick={onOpen}>
-        <img src={props.src} width='256px' height='256px'/>
-        <p>{props.title}</p>
-    </Box>
-        <Modal isOpen={isOpen} onClose={onClose}>
-            <ModalContent alignContent={'center'}>
-            <span>
-            <Box>
-                <Image src={props.src}/>
-            </Box>
-            <HStack pr='2' pl='2' justifyContent='space-between'>
-            <Text fontSize='3xl'>{props.title}</Text>
-            <Button variant='link' colorScheme='messenger' onClick={deletePost}>Delete</Button>
-            </HStack>
-            </span>
-            </ModalContent>
-        </Modal>
-    </>
-}
-
-const ImageList = (props) => {
 
     const isFirstUpdate = useRef(true);
     const apicall = async () =>  {
@@ -95,14 +174,14 @@ const ImageList = (props) => {
     })
 
     return (
-        props.links == [] ? <Grid  templateColumns='repeat(3, 3fr)' templateRows='repeat(3, 3fr)'>
+        props.links == [] ? <Grid templateColumns='repeat(3, 3fr)' templateRows='repeat(3, 3fr)'>
         </Grid> :
         <Grid gap='3' templateColumns='repeat(3, 1fr)' templateRows='repeat(3, 1fr)'>
             {
                 props.links.map((link, i) => {
                     console.log(link)
                     return <GridItem key={i}>
-                                <ImageFrame src={'http://localhost:3003/static/' + link['name']} title={link['title']} token={props.token} _id={link._id}/>
+                                <ImageFrame src={'http://localhost:3003/static/' + link['name']} title={link['title']} token={props.token} _id={link._id} deletePost={deletePost} />
                            </GridItem>
                 })
             }
@@ -110,7 +189,7 @@ const ImageList = (props) => {
                 (() => {
                     const boxes = [];
                     for (let i = 0; i < 9 - props.links.length; i++) {
-                        boxes.push(<Box width='256px' height='256px' backgroundColor='gray.50' ></Box>)
+                        boxes.push(<Box width='256px' height='256px' backgroundColor='gray.50' border='1px solid' ></Box>)
                     }
                     return boxes;
                 })()
@@ -143,7 +222,6 @@ const PublicImageFrame = (props) => {
 }
 
 const PublicImageList = () => {
-
     let params = useParams();
     const [links, setLinks] = useState([]);
     const isFirstUpdate = useRef(true);
@@ -280,7 +358,6 @@ const App = () => {
         });
     }
 
-
     const onUpload = async event => {
 
         if(file != null) {
@@ -379,18 +456,17 @@ const App = () => {
             else {
                 console.log("file is null!")
             }
-    }
+        }
 
         return (
             <div className="App">
                 <BrowserRouter>
                 <header className="App-header">
+                    <TopWidget />
                     <Center >
                     <VStack>
-
-                    <Text fontSize='7xl'  id='badmofo'>minigram</Text>
                     {
-                        logged_in ? <Box><HStack pb='8'><Text>Logged In.</Text><Button variant='link' colorScheme='messenger' onClick={onLogout}>Logout</Button></HStack></Box> : <Box><p>Log In</p>
+                        logged_in ? <></> : <Box><p>Log In</p>
                         <form>
                             <input type='text' placeholder='username' value={user} onChange={onUserChange}/>
                             <input type='password' placeholder='password' value={pass} onChange={onPassChange}/>
@@ -411,6 +487,7 @@ const App = () => {
                     {
                         logged_in ?
                         <Box>
+                        <UserWidget onLogout={onLogout}/>
                         <Box>
                             <ImageList token={token} links={links} setLinks={setLinks} />
                         </Box>
