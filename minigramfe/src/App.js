@@ -13,7 +13,12 @@ import { Box, Center, Image, Flex, Badge, Text, GridItem, Grid,
     InputGroup,
     InputLeftElement,
     InputRightElement,
-    
+    Container,
+    ButtonGroup,
+    Divider,
+    IconButton,
+  
+
   } from "@chakra-ui/react";
 import {
     Search2Icon
@@ -62,8 +67,15 @@ const AddPhotoWidget = () => {
     return;
 }
 
-const BottomWidget = () => {
-    return;
+const Footer = () => {
+    return (
+        <Box as="footer" role="contentinfo" padding='12'>
+        <Divider />
+        <Center paddingTop='12'>
+            <Text>&copy; 2022 Artem Yatsenko</Text>
+        </Center>
+      </Box>
+  )
 }
 
 const UserWidget = (props) => {
@@ -84,9 +96,7 @@ const UserWidget = (props) => {
             </HStack>
         </VStack>
     </HStack>
-
     </Center>
-    
     );
 }
 
@@ -430,7 +440,7 @@ const App = () => {
             }
     }
 
-    const onLogout = event => {
+    const onLogout = () => {
         killState()
         cookies.remove('token')
         setLoggedIn(false)
@@ -459,9 +469,9 @@ const App = () => {
         }
 
         return (
-            <div className="App">
+            <Box className="App" width='100vw'>
                 <BrowserRouter>
-                <header className="App-header">
+                <header className="App-header" width='100vw'>
                     <TopWidget />
                     <Center >
                     <VStack>
@@ -480,9 +490,7 @@ const App = () => {
                         </form>
                         </Box>
                     }
-
                     <Routes>
-
                     <Route path='/' element=
                     {
                         logged_in ?
@@ -521,7 +529,8 @@ const App = () => {
                         
                 </header>
                 </BrowserRouter>
-            </div>
+                <Footer />
+            </Box>
         );
 }
 
