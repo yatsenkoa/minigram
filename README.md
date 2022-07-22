@@ -11,11 +11,7 @@
     A minimal photo-sharing website.
     <br />
     <br />
-    <a href="https://github.com/iandraves/Dashli">LIVE DEMO</a>
-    ·
-    <a href="https://github.com/iandraves/Dashli/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/iandraves/Dashli/issues">Request Feature</a>
+    <a href="">Live Demo</a>
   </p>
 </div>
 
